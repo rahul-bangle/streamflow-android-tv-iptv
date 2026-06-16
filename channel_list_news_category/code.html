@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>StreamFlow - Channel List</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed-variant": "#474746",
+                        "on-primary-fixed": "#410001",
+                        "inverse-on-surface": "#313030",
+                        "tertiary-fixed-dim": "#c8c6c5",
+                        "secondary-fixed-dim": "#adc6ff",
+                        "primary-fixed-dim": "#ffb4aa",
+                        "on-error-container": "#ffdad6",
+                        "surface-dim": "#131313",
+                        "background": "#131313",
+                        "surface-container": "#201f1f",
+                        "on-background": "#e5e2e1",
+                        "secondary-fixed": "#d8e2ff",
+                        "on-secondary-container": "#00285c",
+                        "primary": "#ffb4aa",
+                        "surface-container-highest": "#353534",
+                        "tertiary-fixed": "#e5e2e1",
+                        "tertiary": "#c8c6c5",
+                        "secondary-container": "#4b8eff",
+                        "on-surface": "#e5e2e1",
+                        "on-error": "#690005",
+                        "on-tertiary-fixed": "#1b1c1c",
+                        "secondary": "#adc6ff",
+                        "surface": "#131313",
+                        "outline": "#af8782",
+                        "surface-container-lowest": "#0e0e0e",
+                        "on-secondary": "#002e69",
+                        "surface-variant": "#353534",
+                        "primary-container": "#e50914",
+                        "surface-container-low": "#1c1b1b",
+                        "on-primary-container": "#fff7f6",
+                        "error": "#ffb4ab",
+                        "surface-tint": "#ffb4aa",
+                        "surface-container-high": "#2a2a2a",
+                        "inverse-primary": "#c0000c",
+                        "on-surface-variant": "#e9bcb6",
+                        "on-tertiary-container": "#fbf8f8",
+                        "outline-variant": "#5e3f3b",
+                        "on-secondary-fixed-variant": "#004493",
+                        "on-primary-fixed-variant": "#930007",
+                        "on-primary": "#690003",
+                        "on-tertiary": "#303030",
+                        "tertiary-container": "#737272",
+                        "primary-fixed": "#ffdad5",
+                        "error-container": "#93000a",
+                        "surface-bright": "#393939",
+                        "on-secondary-fixed": "#001a41",
+                        "inverse-surface": "#e5e2e1"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sidebar-width-collapsed": "100px",
+                        "safe-margin-x": "80px",
+                        "card-gap": "32px",
+                        "sidebar-width-expanded": "320px",
+                        "safe-margin-y": "60px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "label-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-lg": ["18px", {"lineHeight": "24px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "label-sm": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                        "headline-lg": ["48px", {"lineHeight": "56px", "fontWeight": "700"}],
+                        "body-lg": ["24px", {"lineHeight": "32px", "fontWeight": "400"}],
+                        "display-lg": ["72px", {"lineHeight": "84px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                        "body-md": ["20px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "headline-md": ["36px", {"lineHeight": "44px", "fontWeight": "600"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: #121212;
+            color: #e5e2e1;
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .channel-card {
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transform-origin: center center;
+            will-change: transform, box-shadow, border-color;
+        }
+
+        .channel-card:focus, .channel-card.focused {
+            outline: none;
+            transform: scale(1.05);
+            z-index: 10;
+            border: 4px solid #ffb4aa;
+            box-shadow: 0 0 24px rgba(255, 180, 170, 0.4), 0 16px 32px rgba(0,0,0,0.5);
+            background-color: #2a2a2a;
+        }
+
+        .channel-card:focus .metadata-reveal, .channel-card.focused .metadata-reveal {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .metadata-reveal {
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+        }
+
+        /* Hide scrollbar for lean-back experience but allow scrolling */
+        ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface antialiased h-screen w-screen overflow-hidden flex selection:bg-primary-container selection:text-on-primary-container">
+<!-- SideNavBar (JSON Derived) -->
+<nav aria-label="Main Navigation" class="fixed left-0 top-0 h-full w-sidebar-width-collapsed hover:w-sidebar-width-expanded transition-all duration-300 z-50 bg-surface-container bg-surface-container-high backdrop-blur-xl shadow-2xl flex flex-col py-safe-margin-y gap-card-gap group overflow-hidden">
+<!-- Brand/Avatar Header -->
+<div class="px-6 flex items-center gap-4 mb-8 whitespace-nowrap">
+<div class="w-12 h-12 rounded-full bg-surface-container-highest flex-shrink-0 overflow-hidden border-2 border-transparent group-hover:border-primary transition-colors">
+<img alt="User Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAfWX8HLjJC14AOwlvAGhK0gGAyr0ZsS0B3Q624Y3ObGGh3_SY3bI_m7mswVsQe7FPwyUsqvk8prL_balboXYAPR9CjA_9G51CGd84H7AjFVR4jvEfUIHiqv738plnUX-Qq7pu5thTre0QC4xnmqRXZk4jcLMUqyDajXplOlH7uezFk_hz8pLG_95CGZschQ49lxk_m5DM4MZis_KhZEtf72UIQgzSieaWcz6leKvSeCBsdiqj-UAN0nQL19wqQqTbXusuoxDpFSOM"/>
+</div>
+<div class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col">
+<span class="font-headline-md text-headline-md font-bold text-primary">Premium TV</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Active Subscription</span>
+</div>
+</div>
+<!-- Navigation Links -->
+<div class="flex flex-col gap-2 w-full px-4">
+<a class="flex items-center gap-6 p-4 rounded-xl text-on-surface-variant opacity-70 hover:scale-105 hover:bg-surface-container-highest transition-transform focus:scale-110 focus:border-primary focus:bg-primary-container focus:outline-none" href="#">
+<span class="material-symbols-outlined text-[28px] flex-shrink-0">home</span>
+<span class="font-label-lg text-label-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">Home</span>
+</a>
+<a class="flex items-center gap-6 p-4 rounded-xl border-l-4 border-primary bg-primary-container text-on-primary-container font-bold scale-105 focus:outline-none" href="#">
+<span class="material-symbols-outlined text-[28px] flex-shrink-0" style="font-variation-settings: 'FILL' 1;">live_tv</span>
+<span class="font-label-lg text-label-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">Live TV</span>
+</a>
+<a class="flex items-center gap-6 p-4 rounded-xl text-on-surface-variant opacity-70 hover:scale-105 hover:bg-surface-container-highest transition-transform focus:scale-110 focus:border-primary focus:bg-primary-container focus:outline-none" href="#">
+<span class="material-symbols-outlined text-[28px] flex-shrink-0">movie</span>
+<span class="font-label-lg text-label-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">Movies</span>
+</a>
+<a class="flex items-center gap-6 p-4 rounded-xl text-on-surface-variant opacity-70 hover:scale-105 hover:bg-surface-container-highest transition-transform focus:scale-110 focus:border-primary focus:bg-primary-container focus:outline-none" href="#">
+<span class="material-symbols-outlined text-[28px] flex-shrink-0">allergies</span>
+<span class="font-label-lg text-label-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">Series</span>
+</a>
+</div>
+<div class="mt-auto flex flex-col gap-2 w-full px-4">
+<a class="flex items-center gap-6 p-4 rounded-xl text-on-surface-variant opacity-70 hover:scale-105 hover:bg-surface-container-highest transition-transform focus:scale-110 focus:border-primary focus:bg-primary-container focus:outline-none" href="#">
+<span class="material-symbols-outlined text-[28px] flex-shrink-0">settings</span>
+<span class="font-label-lg text-label-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">Settings</span>
+</a>
+</div>
+</nav>
+<!-- TopAppBar (JSON Derived) -->
+<header class="fixed top-0 right-0 w-full z-40 bg-transparent bg-gradient-to-b from-background to-transparent flex justify-between items-center px-safe-margin-x py-8 pl-[calc(100px+80px)] pointer-events-none">
+<div class="flex items-center">
+<span class="font-headline-lg text-headline-lg font-black text-primary drop-shadow-lg">StreamFlow</span>
+</div>
+<div class="flex items-center gap-6 pointer-events-auto">
+<!-- Search on Right -->
+<button aria-label="Search" class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-primary focus:ring-4 focus:ring-primary focus:scale-110 transition-transform duration-200 focus:outline-none">
+<span class="material-symbols-outlined text-[24px]">search</span>
+</button>
+<!-- Trailing Icons -->
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-on-surface-variant">wifi</span>
+<span class="material-symbols-outlined text-on-surface-variant">schedule</span>
+</div>
+<div class="w-10 h-10 rounded-full overflow-hidden border border-surface-variant">
+<img alt="User Avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXD3RKHO_ncHCodqYyP01prBJ9CmMsWjmn4uNrFHNkHUPVbRp_-2gLmjzkDL8JmqXnKauqTeXcFwuqtbsuhQgamOObpVyKS37Pagtai3p6vPCwhqr52t5G9-AbLEFL31FGWn8HPTDQbny7yVaekrEujZXvvme6R_NrWFP-cWzJEjKD49_VfkXXS8FoGL1JKQJCRbTMKBmMpoAOz7DaCKWNZl0XNWbf1ZkVTVA2LVk4x94NxHJVpGtcvhl09FsKVN3dvROsgtW8F3Q"/>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 ml-sidebar-width-collapsed pt-[140px] px-safe-margin-x pb-safe-margin-y h-full overflow-y-auto flex flex-col relative z-0">
+<!-- Context Header -->
+<div class="mb-card-gap flex flex-col gap-2">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary text-[40px]">newspaper</span>
+<h1 class="font-display-lg text-display-lg text-on-surface m-0 p-0 leading-none">News Channels</h1>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">951 Channels Found • Worldwide News • English</p>
+</div>
+<!-- Channel Grid Container -->
+<!-- Using a responsive grid layout optimized for 16:9 TV displays -->
+<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-gutter pb-[100px]">
+<!-- Channel Card 1 (FOCUSED STATE) -->
+<button aria-label="Channel 101 BBC News Now Playing World News Today" class="channel-card focused rounded-xl bg-surface-container overflow-hidden flex flex-col relative aspect-video border-2 border-transparent text-left group">
+<div class="absolute top-4 left-4 z-20 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
+<span class="font-label-sm text-label-sm text-white font-bold">CH 101</span>
+</div>
+<!-- Channel Logo/Background Area -->
+<div class="flex-1 w-full bg-white flex items-center justify-center p-8 relative overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10"></div>
+<h2 class="text-black font-black text-4xl relative z-0 tracking-tighter">BBC NEWS</h2>
+</div>
+<!-- Info Area -->
+<div class="p-4 bg-surface-container-high absolute bottom-0 w-full z-20 metadata-reveal">
+<h3 class="font-label-lg text-label-lg text-on-surface truncate">BBC News</h3>
+<div class="flex items-center gap-2 mt-1">
+<span class="w-2 h-2 rounded-full bg-primary-container shadow-[0_0_8px_#e50914] animate-pulse"></span>
+<p class="font-label-sm text-label-sm text-primary truncate">World News Today</p>
+</div>
+</div>
+</button>
+<!-- Channel Card 2 -->
+<button aria-label="Channel 102 CNN Now Playing The Situation Room" class="channel-card rounded-xl bg-surface-container overflow-hidden flex flex-col relative aspect-video border-2 border-transparent text-left group">
+<div class="absolute top-4 left-4 z-20 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
+<span class="font-label-sm text-label-sm text-white font-bold">CH 102</span>
+</div>
+<div class="flex-1 w-full bg-[#cc0000] flex items-center justify-center p-8 relative overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10"></div>
+<h2 class="text-white font-black text-5xl relative z-0 tracking-tighter">CNN</h2>
+</div>
+<div class="p-4 bg-surface-container-high absolute bottom-0 w-full z-20 metadata-reveal">
+<h3 class="font-label-lg text-label-lg text-on-surface truncate">CNN International</h3>
+<div class="flex items-center gap-2 mt-1">
+<span class="w-2 h-2 rounded-full bg-primary-container"></span>
+<p class="font-label-sm text-label-sm text-on-surface-variant truncate">The Situation Room</p>
+</div>
+</div>
+</button>
+<!-- Channel Card 3 -->
+<button aria-label="Channel 103 Al Jazeera Now Playing Newshour" class="channel-card rounded-xl bg-surface-container overflow-hidden flex flex-col relative aspect-video border-2 border-transparent text-left group">
+<div class="absolute top-4 left-4 z-20 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
+<span class="font-label-sm text-label-sm text-white font-bold">CH 103</span>
+</div>
+<div class="flex-1 w-full bg-[#f9a01b] flex items-center justify-center p-8 relative overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10"></div>
+<div class="text-white font-bold text-2xl relative z-0 flex flex-col items-center leading-tight">
+<span>AL JAZEERA</span>
+<span class="text-sm font-normal uppercase tracking-widest">English</span>
+</div>
+</div>
+<div class="p-4 bg-surface-container-high absolute bottom-0 w-full z-20 metadata-reveal">
+<h3 class="font-label-lg text-label-lg text-on-surface truncate">Al Jazeera</h3>
+<div class="flex items-center gap-2 mt-1">
+<span class="w-2 h-2 rounded-full bg-primary-container"></span>
+<p class="font-label-sm text-label-sm text-on-surface-variant truncate">Newshour</p>
+</div>
+</div>
+</button>
+<!-- Channel Card 4 -->
+<button aria-label="Channel 104 Sky News Now Playing Breakfast" class="channel-card rounded-xl bg-surface-container overflow-hidden flex flex-col relative aspect-video border-2 border-transparent text-left group">
+<div class="absolute top-4 left-4 z-20 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
+<span class="font-label-sm text-label-sm text-white font-bold">CH 104</span>
+</div>
+<div class="flex-1 w-full bg-[#000f9e] flex items-center justify-center p-8 relative overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10"></div>
+<div class="text-white font-black text-3xl relative z-0 flex items-center gap-2">
+<span class="bg-red-600 px-2 py-1 rounded">sky</span>
+<span>news</span>
+</div>
+</div>
+<div class="p-4 bg-surface-container-high absolute bottom-0 w-full z-20 metadata-reveal">
+<h3 class="font-label-lg text-label-lg text-on-surface truncate">Sky News</h3>
+<div class="flex items-center gap-2 mt-1">
+<span class="w-2 h-2 rounded-full bg-primary-container"></span>
+<p class="font-label-sm text-label-sm text-on-surface-variant truncate">Breakfast with Kay Burley</p>
+</div>
+</div>
+</button>
+<!-- Channel Card 5 -->
+<button aria-label="Channel 105 Bloomberg Now Playing Surveillance" class="channel-card rounded-xl bg-surface-container overflow-hidden flex flex-col relative aspect-video border-2 border-transparent text-left group">
+<div class="absolute top-4 left-4 z-20 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
+<span class="font-label-sm text-label-sm text-white font-bold">CH 105</span>
+</div>
+<div class="flex-1 w-full bg-black flex items-center justify-center p-8 relative overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10"></div>
+<h2 class="text-white font-bold text-3xl relative z-0 tracking-tight">Bloomberg</h2>
+</div>
+<div class="p-4 bg-surface-container-high absolute bottom-0 w-full z-20 metadata-reveal">
+<h3 class="font-label-lg text-label-lg text-on-surface truncate">Bloomberg TV</h3>
+<div class="flex items-center gap-2 mt-1">
+<span class="w-2 h-2 rounded-full bg-primary-container"></span>
+<p class="font-label-sm text-label-sm text-on-surface-variant truncate">Bloomberg Surveillance</p>
+</div>
+</div>
+</button>
+<!-- Channel Card 6 -->
+<button aria-label="Channel 106 Fox News Now Playing Special Report" class="channel-card rounded-xl bg-surface-container overflow-hidden flex flex-col relative aspect-video border-2 border-transparent text-left group">
+<div class="absolute top-4 left-4 z-20 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
+<span class="font-label-sm text-label-sm text-white font-bold">CH 106</span>
+</div>
+<div class="flex-1 w-full bg-[#003366] flex items-center justify-center p-8 relative overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10"></div>
+<div class="text-white font-black text-3xl relative z-0 flex flex-col items-center">
+<span class="text-red-500 tracking-tighter">FOX</span>
+<span class="tracking-widest text-sm">NEWS</span>
+</div>
+</div>
+<div class="p-4 bg-surface-container-high absolute bottom-0 w-full z-20 metadata-reveal">
+<h3 class="font-label-lg text-label-lg text-on-surface truncate">Fox News</h3>
+<div class="flex items-center gap-2 mt-1">
+<span class="w-2 h-2 rounded-full bg-primary-container"></span>
+<p class="font-label-sm text-label-sm text-on-surface-variant truncate">Special Report</p>
+</div>
+</div>
+</button>
+<!-- Channel Card 7 -->
+<button aria-label="Channel 107 Euronews Now Playing European Affairs" class="channel-card rounded-xl bg-surface-container overflow-hidden flex flex-col relative aspect-video border-2 border-transparent text-left group">
+<div class="absolute top-4 left-4 z-20 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
+<span class="font-label-sm text-label-sm text-white font-bold">CH 107</span>
+</div>
+<div class="flex-1 w-full bg-white flex items-center justify-center p-8 relative overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10"></div>
+<h2 class="text-blue-600 font-bold text-3xl relative z-0 lowercase tracking-tighter">euronews.</h2>
+</div>
+<div class="p-4 bg-surface-container-high absolute bottom-0 w-full z-20 metadata-reveal">
+<h3 class="font-label-lg text-label-lg text-on-surface truncate">Euronews</h3>
+<div class="flex items-center gap-2 mt-1">
+<span class="w-2 h-2 rounded-full bg-primary-container"></span>
+<p class="font-label-sm text-label-sm text-on-surface-variant truncate">European Affairs</p>
+</div>
+</div>
+</button>
+<!-- Channel Card 8 -->
+<button aria-label="Channel 108 CNBC Now Playing Squawk Box" class="channel-card rounded-xl bg-surface-container overflow-hidden flex flex-col relative aspect-video border-2 border-transparent text-left group">
+<div class="absolute top-4 left-4 z-20 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
+<span class="font-label-sm text-label-sm text-white font-bold">CH 108</span>
+</div>
+<div class="flex-1 w-full bg-[#1a1a1a] flex items-center justify-center p-8 relative overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10"></div>
+<div class="text-white font-bold text-3xl relative z-0 flex items-center gap-1">
+<div class="flex flex-col gap-0.5 mr-1">
+<div class="w-3 h-3 bg-red-500 rounded-sm"></div>
+<div class="w-3 h-3 bg-blue-500 rounded-sm"></div>
+</div>
+                        CNBC
+                    </div>
+</div>
+<div class="p-4 bg-surface-container-high absolute bottom-0 w-full z-20 metadata-reveal">
+<h3 class="font-label-lg text-label-lg text-on-surface truncate">CNBC Europe</h3>
+<div class="flex items-center gap-2 mt-1">
+<span class="w-2 h-2 rounded-full bg-primary-container"></span>
+<p class="font-label-sm text-label-sm text-on-surface-variant truncate">Squawk Box Europe</p>
+</div>
+</div>
+</button>
+</div>
+</main>
+<!-- Scroll Indicator Overlay (Cinematic subtle hint) -->
+<div class="fixed bottom-0 left-0 w-full h-32 bg-gradient-to-t from-background via-background/80 to-transparent z-30 pointer-events-none flex items-end justify-center pb-6">
+<div class="flex flex-col items-center text-on-surface-variant animate-bounce opacity-50">
+<span class="font-label-sm text-label-sm tracking-widest uppercase mb-1">More Channels</span>
+<span class="material-symbols-outlined">keyboard_arrow_down</span>
+</div>
+</div>
+<!-- Script to simulate D-Pad TV Navigation -->
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const cards = document.querySelectorAll('.channel-card');
+            
+            // Allow mouse hover to simulate focus for web preview purposes
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', () => {
+                    // Remove focus from all
+                    cards.forEach(c => c.classList.remove('focused'));
+                    // Add to current
+                    card.classList.add('focused');
+                    card.focus();
+                });
+            });
+
+            // Basic keyboard navigation simulation (Up/Down/Left/Right)
+            // Simplified for prototype
+            document.addEventListener('keydown', (e) => {
+                const active = document.activeElement;
+                if(!active.classList.contains('channel-card')) return;
+                
+                const idx = Array.from(cards).indexOf(active);
+                let nextIdx = idx;
+
+                const cols = window.innerWidth >= 1280 ? 5 : 
+                             window.innerWidth >= 1024 ? 4 : 
+                             window.innerWidth >= 768 ? 3 : 2;
+
+                if(e.key === 'ArrowRight') nextIdx = Math.min(idx + 1, cards.length - 1);
+                if(e.key === 'ArrowLeft') nextIdx = Math.max(idx - 1, 0);
+                if(e.key === 'ArrowDown') nextIdx = Math.min(idx + cols, cards.length - 1);
+                if(e.key === 'ArrowUp') nextIdx = Math.max(idx - cols, 0);
+
+                if(nextIdx !== idx) {
+                    e.preventDefault();
+                    cards.forEach(c => c.classList.remove('focused'));
+                    cards[nextIdx].classList.add('focused');
+                    cards[nextIdx].focus();
+                    cards[nextIdx].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            });
+            
+            // Initial focus
+            if(cards.length > 0) {
+                cards[0].focus();
+            }
+        });
+    </script>
+</body></html>
