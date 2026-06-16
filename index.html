@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>StreamFlow IPTV</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+  
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "tertiary-container": "#737272",
+            "surface-variant": "#353534",
+            "background": "#131313",
+            "surface": "#131313",
+            "surface-container-highest": "#353534",
+            "on-tertiary-fixed": "#1b1c1c",
+            "secondary-fixed": "#d8e2ff",
+            "on-primary-fixed-variant": "#930007",
+            "tertiary-fixed-dim": "#c8c6c5",
+            "on-tertiary-fixed-variant": "#474746",
+            "on-primary-fixed": "#410001",
+            "inverse-primary": "#c0000c",
+            "surface-container-lowest": "#0e0e0e",
+            "on-secondary": "#002e69",
+            "surface-container-high": "#2a2a2a",
+            "on-secondary-fixed-variant": "#004493",
+            "outline": "#af8782",
+            "secondary-container": "#4b8eff",
+            "surface-dim": "#131313",
+            "primary": "#ffb4aa",
+            "inverse-on-surface": "#313030",
+            "on-error-container": "#ffdad6",
+            "surface-tint": "#ffb4aa",
+            "error": "#ffb4ab",
+            "secondary-fixed-dim": "#adc6ff",
+            "on-primary-container": "#fff7f6",
+            "surface-container-low": "#1c1b1b",
+            "primary-fixed-dim": "#ffb4aa",
+            "inverse-surface": "#e5e2e1",
+            "surface-container": "#201f1f",
+            "secondary": "#adc6ff",
+            "primary-container": "#e50914",
+            "on-secondary-container": "#00285c",
+            "surface-bright": "#393939",
+            "outline-variant": "#5e3f3b",
+            "primary-fixed": "#ffdad5",
+            "on-primary": "#690003",
+            "on-background": "#e5e2e1",
+            "on-tertiary": "#303030",
+            "on-error": "#690005",
+            "error-container": "#93000a",
+            "tertiary": "#c8c6c5",
+            "tertiary-fixed": "#e5e2e1",
+            "on-secondary-fixed": "#001a41",
+            "on-tertiary-container": "#fbf8f8",
+            "on-surface": "#e5e2e1",
+            "on-surface-variant": "#e9bcb6"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "safe-margin-x": "80px",
+            "gutter": "24px",
+            "safe-margin-y": "60px",
+            "sidebar-width-collapsed": "100px",
+            "sidebar-width-expanded": "320px",
+            "card-gap": "32px"
+          },
+          "fontFamily": {
+            "label-lg": ["Inter"],
+            "body-md": ["Inter"],
+            "headline-md": ["Inter"],
+            "headline-lg": ["Inter"],
+            "body-lg": ["Inter"],
+            "label-sm": ["Inter"],
+            "display-lg": ["Inter"]
+          },
+          "fontSize": {
+            "label-lg": ["18px", {"lineHeight": "24px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+            "body-md": ["20px", {"lineHeight": "28px", "fontWeight": "400"}],
+            "headline-md": ["36px", {"lineHeight": "44px", "fontWeight": "600"}],
+            "headline-lg": ["48px", {"lineHeight": "56px", "fontWeight": "700"}],
+            "body-lg": ["24px", {"lineHeight": "32px", "fontWeight": "400"}],
+            "label-sm": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+            "display-lg": ["72px", {"lineHeight": "84px", "letterSpacing": "-0.02em", "fontWeight": "800"}]
+          }
+        },
+      },
+    }
+  </script>
+  
+  <style>
+    body {
+      background-color: #131313;
+      color: #e5e2e1;
+      overflow: hidden;
+    }
+    
+    /* D-Pad focus indicators matching specs */
+    .tv-focusable:focus, .tv-focusable.focused {
+      outline: none;
+      transform: scale(1.05);
+      border: 4px solid #e50914 !important;
+      box-shadow: 0 0 20px rgba(229, 9, 20, 0.6);
+      z-index: 10;
+    }
+    
+    .tv-focusable-sidebar:focus, .tv-focusable-sidebar.focused {
+      outline: none;
+      transform: scale(1.05);
+      border-left: 4px solid #e50914 !important;
+      background-color: #353534;
+      z-index: 10;
+    }
+
+    .tv-transition {
+      transition: transform 0.2s ease-out, border-color 0.2s ease-out, box-shadow 0.2s ease-out, background-color 0.2s ease-out;
+    }
+
+    .glass-panel, .glass-overlay {
+      background: rgba(30, 30, 30, 0.65);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    ::-webkit-scrollbar {
+      display: none;
+    }
+    .hide-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    .hide-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .hidden {
+      display: none !important;
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.4.12/hls.min.js"></script>
+</head>
+<body class="bg-background text-on-surface h-screen w-screen overflow-hidden flex">
+
+  <!-- Splash Screen (Initial Route) -->
+  <div id="splash-screen" class="absolute inset-0 z-[100] bg-background flex flex-col items-center justify-center">
+    <div class="flex flex-col items-center space-y-6">
+      <span class="material-symbols-outlined text-[96px] text-primary-container animate-pulse" style="font-variation-settings: 'FILL' 1;">live_tv</span>
+      <h1 class="font-display-lg text-display-lg font-black text-primary-container tracking-tighter">StreamFlow IPTV</h1>
+      <p id="splash-status" class="font-body-lg text-body-lg text-on-surface-variant animate-pulse">Initializing playlists...</p>
+    </div>
+  </div>
+
+  <!-- Shared SideNavBar -->
+  <nav id="shared-sidebar" class="fixed left-0 top-0 h-full w-[100px] hover:w-[320px] transition-all duration-300 z-50 bg-surface-container backdrop-blur-xl flex flex-col py-safe-margin-y group hidden">
+    <div class="px-6 mb-12 flex items-center space-x-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap overflow-hidden">
+      <div class="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center flex-shrink-0">
+        <span class="material-symbols-outlined text-primary-container" style="font-variation-settings: 'FILL' 1;">account_circle</span>
+      </div>
+      <div>
+        <h1 class="font-headline-md text-headline-md font-bold text-primary-container">IPTV Premium</h1>
+        <p class="font-label-sm text-label-sm text-on-surface-variant">Active Account</p>
+      </div>
+    </div>
+    <div class="flex-1 flex flex-col space-y-4 px-4 w-full">
+      <button id="nav-dashboard" class="tv-focusable-sidebar tv-transition flex items-center space-x-6 p-4 rounded-xl text-on-surface w-full text-left" tabindex="0">
+        <span class="material-symbols-outlined flex-shrink-0 text-[32px]">live_tv</span>
+        <span class="font-label-lg text-label-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">Live TV</span>
+      </button>
+      <button id="nav-search" class="tv-focusable-sidebar tv-transition flex items-center space-x-6 p-4 rounded-xl text-on-surface-variant opacity-60 w-full text-left" tabindex="0">
+        <span class="material-symbols-outlined flex-shrink-0 text-[32px]">search</span>
+        <span class="font-label-lg text-label-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">Search</span>
+      </button>
+      <button id="nav-category" class="tv-focusable-sidebar tv-transition flex items-center space-x-6 p-4 rounded-xl text-on-surface-variant opacity-60 w-full text-left" tabindex="0">
+        <span class="material-symbols-outlined flex-shrink-0 text-[32px]">explore</span>
+        <span class="font-label-lg text-label-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap font-bold">Explore</span>
+      </button>
+    </div>
+    <div class="px-4 mt-auto">
+      <button id="nav-settings" class="tv-focusable-sidebar tv-transition flex items-center space-x-6 p-4 rounded-xl text-on-surface-variant opacity-60 w-full text-left" tabindex="0">
+        <span class="material-symbols-outlined flex-shrink-0 text-[32px]">settings</span>
+        <span class="font-label-lg text-label-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">Settings</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Shared TopAppBar -->
+  <header id="shared-header" class="fixed top-0 right-0 w-[calc(100%-100px)] flex justify-between items-center px-safe-margin-x h-[100px] z-40 bg-gradient-to-b from-background to-transparent hidden">
+    <div class="flex items-center">
+      <span class="font-headline-md text-headline-md font-black text-primary-container">StreamFlow</span>
+    </div>
+    <div class="flex items-center space-x-8">
+      <div class="flex flex-col items-end mr-8">
+        <span id="clock-display" class="font-headline-md text-headline-md font-bold text-on-surface">8:30 PM</span>
+        <div class="flex items-center space-x-2">
+          <div class="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_#22c55e]"></div>
+          <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Connected</span>
+        </div>
+      </div>
+      <div class="flex items-center space-x-4">
+        <button class="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center tv-focusable tv-transition text-on-surface-variant" tabindex="0">
+          <span class="material-symbols-outlined">schedule</span>
+        </button>
+        <button class="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center tv-focusable tv-transition text-on-surface-variant" tabindex="0">
+          <span class="material-symbols-outlined">wifi</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Route Dashboard Screen -->
+  <div id="dashboard-screen" class="w-full h-full hidden">
+    <main class="ml-[100px] mt-[100px] w-[calc(100%-100px)] h-[calc(100vh-100px)] flex px-safe-margin-x pb-safe-margin-y space-x-gutter">
+      <!-- Channel List container -->
+      <div class="w-[30%] h-full flex flex-col pr-4 overflow-y-auto">
+        <div class="flex items-center justify-between mb-6 pl-2">
+          <h2 id="dashboard-category-title" class="font-headline-md text-headline-md font-bold text-on-surface">News Networks</h2>
+          <span id="dashboard-channel-count" class="font-label-sm text-label-sm px-3 py-1 bg-surface-container rounded-full text-on-surface-variant">0 Channels</span>
+        </div>
+        <div id="dashboard-channels-list" class="flex flex-col space-y-3">
+          <!-- Dynamic Channel items inject here -->
+        </div>
+      </div>
+      <!-- Video Player Preview panel -->
+      <div id="dashboard-preview-card" class="w-[70%] h-full flex flex-col justify-end relative rounded-2xl overflow-hidden shadow-2xl border border-surface-variant bg-surface-container-lowest tv-focusable tv-transition" tabindex="0">
+        <div id="dashboard-preview-bg" class="absolute inset-0 w-full h-full bg-surface-container-highest" style="background-size: cover; background-position: center;">
+          <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
+        </div>
+        <div class="absolute top-6 right-6 flex items-center space-x-4">
+          <div class="px-3 py-1 bg-primary-container text-on-primary-container font-label-sm text-label-sm font-bold rounded animate-pulse shadow-[0_0_15px_#e50914]">LIVE</div>
+          <div class="w-16 h-12 bg-white rounded flex items-center justify-center shadow-lg text-black font-bold font-label-lg" id="dashboard-preview-logo-placeholder">IPTV</div>
+        </div>
+        <div class="glass-panel p-8 w-full z-10 flex flex-col space-y-6">
+          <div>
+            <h3 id="dashboard-preview-title" class="font-headline-lg text-headline-lg font-bold text-on-surface mb-2">No Channel Selected</h3>
+            <p id="dashboard-preview-desc" class="font-body-md text-body-md text-on-surface-variant max-w-3xl line-clamp-2">Select a channel from the left sidebar panel to start streaming playback.</p>
+          </div>
+          <div class="flex items-center space-x-6">
+            <button id="dashboard-play-btn" class="w-16 h-16 rounded-full bg-white text-black flex items-center justify-center tv-focusable tv-transition flex-shrink-0" tabindex="0">
+              <span class="material-symbols-outlined text-[36px]" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+            </button>
+            <div class="flex-1 flex flex-col space-y-2">
+              <div class="w-full h-2 bg-surface-container rounded-full overflow-hidden">
+                <div class="h-full bg-primary-container w-[50%] relative">
+                  <div class="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full shadow-[0_0_10px_white]"></div>
+                </div>
+              </div>
+              <div class="flex justify-between font-label-sm text-label-sm text-on-surface-variant">
+                <span>8:00 PM</span>
+                <span>9:00 PM</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Route Search Screen with On-Screen Keyboard -->
+  <div id="search-screen" class="w-full h-full hidden">
+    <main class="ml-[100px] mt-[100px] w-[calc(100%-100px)] h-[calc(100vh-100px)] flex px-safe-margin-x pb-safe-margin-y space-x-gutter">
+      <!-- Search Side: Input and Virtual Keyboard -->
+      <div class="w-[50%] h-full flex flex-col pr-6 justify-center">
+        <div class="relative mb-6">
+          <input id="search-input-field" class="bg-surface-container-high/80 text-on-surface border-0 rounded-full py-4 px-6 pl-14 w-full placeholder-on-surface-variant backdrop-blur-md tv-focusable text-body-md font-body-md" placeholder="Search channels..." tabindex="0" type="text" readonly/>
+          <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+        </div>
+        <!-- TV Layout Keyboard -->
+        <div id="virtual-keyboard" class="grid grid-cols-6 gap-2 bg-surface-container-high p-4 rounded-xl border border-white/5">
+          <!-- Keyboard keys will be rendered via JS -->
+        </div>
+      </div>
+      <!-- Search Results Side -->
+      <div class="w-[50%] h-full flex flex-col">
+        <h2 class="font-headline-md text-headline-md font-bold text-on-surface mb-6">Results</h2>
+        <div id="search-results-list" class="flex flex-col space-y-3 overflow-y-auto flex-1 pr-2">
+          <!-- Found channel list items here -->
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Route Category Screen (Explore Grid) -->
+  <div id="category-screen" class="w-full h-full hidden">
+    <main class="ml-[100px] h-screen overflow-y-auto pb-safe-margin-y pt-[120px] px-safe-margin-x scroll-smooth">
+      <div class="max-w-[1600px] mx-auto space-y-12">
+        <section aria-label="Categories">
+          <h2 class="font-headline-lg text-headline-lg text-on-surface mb-8 tracking-tight">Categories</h2>
+          <div id="category-grid" class="grid grid-cols-4 gap-gutter">
+            <!-- Dynamic grids generated via JS -->
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- Route Fullscreen Player Screen -->
+  <div id="player-screen" class="w-full h-full absolute inset-0 z-40 hidden bg-black">
+    <!-- Video Player Element -->
+    <video id="hls-video-element" class="w-full h-full object-fill z-0"></video>
+    
+    <!-- Video Controls Overlay -->
+    <div id="player-controls-overlay" class="absolute inset-0 z-10 flex flex-col justify-between p-safe-margin-x pointer-events-none transition-opacity duration-300">
+      <!-- Header Bar overlay -->
+      <div class="flex justify-between items-center pointer-events-auto">
+        <button id="player-back-btn" class="w-12 h-12 rounded-full bg-surface-bright/20 flex items-center justify-center hover:bg-surface-bright/50 transition-colors text-on-surface tv-focusable">
+          <span class="material-symbols-outlined">arrow_back</span>
+        </button>
+        <span id="player-time" class="font-label-lg text-label-lg bg-surface-container/50 px-4 py-2 rounded-full backdrop-blur-md">8:45 PM</span>
+      </div>
+      
+      <!-- Bottom Controls panel -->
+      <div class="glass-overlay rounded-xl p-8 border border-surface-bright/20 flex flex-col gap-6 pointer-events-auto w-full">
+        <div class="flex items-end justify-between">
+          <div class="flex items-center gap-6">
+            <div id="player-channel-logo" class="w-20 h-20 bg-surface-container-high rounded-lg flex items-center justify-center text-2xl font-bold border border-surface-bright/30 shadow-lg text-white">IPTV</div>
+            <div>
+              <div id="player-channel-name" class="font-headline-md text-headline-md mb-1">Channel Name</div>
+              <div id="player-program-title" class="font-body-md text-body-md text-tertiary">Live Stream</div>
+            </div>
+          </div>
+          <div class="flex gap-4">
+            <button id="player-prev-btn" class="w-12 h-12 rounded-full bg-surface-bright/20 flex items-center justify-center hover:bg-surface-bright/50 transition-colors text-on-surface tv-focusable">
+              <span class="material-symbols-outlined">skip_previous</span>
+            </button>
+            <button id="player-play-btn" class="w-16 h-16 rounded-full bg-white text-black flex items-center justify-center tv-focusable">
+              <span id="player-play-icon" class="material-symbols-outlined text-3xl">pause</span>
+            </button>
+            <button id="player-next-btn" class="w-12 h-12 rounded-full bg-surface-bright/20 flex items-center justify-center hover:bg-surface-bright/50 transition-colors text-on-surface tv-focusable">
+              <span class="material-symbols-outlined">skip_next</span>
+            </button>
+          </div>
+        </div>
+        <!-- Progress slider -->
+        <div class="flex items-center gap-4">
+          <span class="font-label-sm text-label-sm text-tertiary">Live</span>
+          <div class="flex-grow h-2 bg-surface-bright/50 rounded-full relative overflow-hidden">
+            <div class="absolute top-0 left-0 h-full bg-primary-container w-[100%] rounded-full"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="parser.js"></script>
+  <script src="player.js"></script>
+  <script src="router.js"></script>
+</body>
+</html>
