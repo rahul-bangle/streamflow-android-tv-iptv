@@ -106,25 +106,24 @@
       overflow: hidden;
     }
     
-    /* D-Pad focus indicators matching specs */
+    /* D-Pad focus indicators matching specs with 0% layout shift */
     .tv-focusable:focus, .tv-focusable.focused {
-      outline: none;
+      outline: none !important;
       transform: scale(1.05);
-      border: 4px solid #e50914 !important;
-      box-shadow: 0 0 20px rgba(229, 9, 20, 0.6);
+      box-shadow: 0 0 0 4px #e50914, 0 0 20px rgba(229, 9, 20, 0.6) !important;
       z-index: 10;
     }
     
     .tv-focusable-sidebar:focus, .tv-focusable-sidebar.focused {
-      outline: none;
+      outline: none !important;
       transform: scale(1.05);
-      border-left: 4px solid #e50914 !important;
-      background-color: #353534;
+      box-shadow: inset 6px 0 0 0 #e50914 !important;
+      background-color: #353534 !important;
       z-index: 10;
     }
 
     .tv-transition {
-      transition: transform 0.2s ease-out, border-color 0.2s ease-out, box-shadow 0.2s ease-out, background-color 0.2s ease-out;
+      transition: transform 0.2s ease-out, box-shadow 0.2s ease-out, background-color 0.2s ease-out;
     }
 
     .glass-panel, .glass-overlay {

@@ -31,6 +31,12 @@ function switchScreen(screenId) {
     }
   });
 
+  // Keep track of the active screen index
+  const foundIdx = screens.indexOf(screenId);
+  if (foundIdx !== -1) {
+    currentScreenIdx = foundIdx;
+  }
+
   // Handle sidebar showing/hiding context
   const sidebar = document.getElementById('shared-sidebar');
   const header = document.getElementById('shared-header');
@@ -47,6 +53,26 @@ function switchScreen(screenId) {
     // Stop HLS video when leaving fullscreen player
     stopHlsPlayer();
   }
+
+  // Update navigation sidebar active class visuals
+  const navItems = {
+    'dashboard-screen': 'nav-dashboard',
+    'search-screen': 'nav-search',
+    'category-screen': 'nav-category'
+  };
+  
+  Object.keys(navItems).forEach(sId => {
+    const btn = document.getElementById(navItems[sId]);
+    if (btn) {
+      if (sId === screenId) {
+        btn.classList.add('border-l-4', 'border-primary-container', 'bg-surface-container-highest');
+        btn.classList.remove('opacity-60');
+      } else {
+        btn.classList.remove('border-l-4', 'border-primary-container', 'bg-surface-container-highest');
+        btn.classList.add('opacity-60');
+      }
+    }
+  });
 
   // Refocus default item on new screen
   setTimeout(() => {
@@ -300,7 +326,7 @@ function handleKeyDown(e) {
   if (!active) return;
   
   // Back/Escape key mapping
-  if (e.key === 'Escape' || e.key === 'Backspace' && active.tagName !== 'INPUT') {
+  if (e.key === 'Escape' || (e.key === 'Backspace' && active.tagName !== 'INPUT')) {
     e.preventDefault();
     const activeScreen = screens.find(id => !document.getElementById(id).classList.contains('hidden'));
     if (activeScreen === 'player-screen') {
@@ -312,7 +338,16 @@ function handleKeyDown(e) {
   }
 
   // Handle D-pad movement mapping grid coordinates
-  const focusables = Array.from(document.querySelectorAll('.focused, .tv-focusable, .tv-focusable-sidebar'));
+  // Filter only visible elements to avoid focusing hidden elements
+  const focusables = Array.from(document.querySelectorAll('.tv-focusable, .tv-focusable-sidebar')).filter(el => {
+    let parent = el;
+    while (parent) {
+      if (parent.classList && parent.classList.contains('hidden')) return false;
+      parent = parent.parentElement;
+    }
+    return true;
+  });
+  
   const idx = focusables.indexOf(active);
   if (idx === -1) return;
   
@@ -380,4 +415,20 @@ window.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('nav-dashboard').addEventListener('click', () => switchScreen('dashboard-screen'));
   document.getElementById('nav-search').addEventListener('click', () => switchScreen('search-screen'));
   document.getElementById('nav-category').addEventListener('click', () => switchScreen('category-screen'));
+  
+  // Back navigation clicks for player back button
+  const playerBackBtn = document.getElementById('player-back-btn');
+  if (playerBackBtn) {
+    playerBackBtn.addEventListener('click', () => {
+      switchScreen('dashboard-screen');
+    });
+  }
+
+  // Bind mouse hovering to synchronize D-pad focus status seamlessly
+  document.addEventListener('mouseover', (e) => {
+    const target = e.target.closest('.tv-focusable, .tv-focusable-sidebar');
+    if (target && target !== focusedElement) {
+      focusElement(target);
+    }
+  });
 });
