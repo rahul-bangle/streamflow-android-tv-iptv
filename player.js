@@ -109,7 +109,28 @@ function startHlsPlayer(streamUrl, channelName, channelLogo) {
     window.workingUrls.delete(url);
     // Visual indicators updates on channel list
     updateChannelUIStatus(url, false);
+    
+    // Save/Filter out the channel from appChannels if it fails consecutively
+    handleConsecutiveFailure(url);
   };
+
+  let failureCountMap = new Map();
+  function handleConsecutiveFailure(url) {
+    let count = (failureCountMap.get(url) || 0) + 1;
+    failureCountMap.set(url, count);
+    
+    if (count >= 2) { // 2 failures trigger permanent UI filter extraction
+      console.warn(`Removing permanently broken stream from active playlist: ${url}`);
+      appChannels = appChannels.filter(ch => ch.url !== url);
+      // Re-populate dashboard/category views
+      if (typeof currentCategory !== 'undefined') {
+        populateDashboardChannels(appChannels, currentCategory);
+      }
+      buildCategoryScreen();
+      // Update local storage so it persists across sessions
+      localStorage.setItem('stitch_iptv_playlist_channels', JSON.stringify(appChannels));
+    }
+  }
 
   window.markChannelWorking = function(url) {
     window.workingUrls.add(url);

@@ -94,6 +94,23 @@ async function loadChannels() {
     }
   }
 
+  if (statusEl) statusEl.textContent = "Fetching pre-filtered working channels...";
+  
+  try {
+    // Attempting to fetch local verified working channels database
+    const response = await fetch('working_channels.json');
+    if (response.ok) {
+      const parsedChannels = await response.json();
+      if (parsedChannels.length > 0) {
+        localStorage.setItem(IPTV_PLAYLIST_KEY, JSON.stringify(parsedChannels));
+        if (statusEl) statusEl.textContent = `Imported ${parsedChannels.length} active channels!`;
+        return parsedChannels;
+      }
+    }
+  } catch (err) {
+    console.warn("Failed loading working channels json, falling back to live fetch...", err);
+  }
+
   if (statusEl) statusEl.textContent = "Fetching India/Hindi channels playlist...";
   
   try {
@@ -101,7 +118,6 @@ async function loadChannels() {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 6000); // 6s timeout limit
 
-    // Using India-specific IPTV-org lists for speed and regional focus
     const response = await fetch('https://iptv-org.github.io/iptv/countries/in.m3u', { signal: controller.signal });
     clearTimeout(timeoutId);
 
