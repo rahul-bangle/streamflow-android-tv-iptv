@@ -102,36 +102,21 @@ async function loadChannels() {
     if (response.ok) {
       const parsedChannels = await response.json();
       if (parsedChannels.length > 0) {
-        localStorage.setItem(IPTV_PLAYLIST_KEY, JSON.stringify(parsedChannels));
-        if (statusEl) statusEl.textContent = `Imported ${parsedChannels.length} active channels!`;
-        return parsedChannels;
+        // Filter out any known dead offline URLs before caching
+        const verifiedChannels = parsedChannels.filter(ch => {
+          // Explicit filter criteria
+          if (!ch.url || ch.url.includes("9xjio.wiseplayout.com") || ch.url.includes("thelegitpro.in") || ch.url.includes("103.72.101.252")) {
+            return false;
+          }
+          return true;
+        });
+        localStorage.setItem(IPTV_PLAYLIST_KEY, JSON.stringify(verifiedChannels));
+        if (statusEl) statusEl.textContent = `Imported ${verifiedChannels.length} active channels!`;
+        return verifiedChannels;
       }
     }
   } catch (err) {
-    console.warn("Failed loading working channels json, falling back to live fetch...", err);
-  }
-
-  if (statusEl) statusEl.textContent = "Fetching India/Hindi channels playlist...";
-  
-  try {
-    // Attempting to fetch public m3u list
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 6000); // 6s timeout limit
-
-    const response = await fetch('https://iptv-org.github.io/iptv/countries/in.m3u', { signal: controller.signal });
-    clearTimeout(timeoutId);
-
-    if (response.ok) {
-      const text = await response.text();
-      const parsedChannels = parseM3U(text);
-      if (parsedChannels.length > 0) {
-        localStorage.setItem(IPTV_PLAYLIST_KEY, JSON.stringify(parsedChannels));
-        if (statusEl) statusEl.textContent = `Imported ${parsedChannels.length} Indian IPTV channels!`;
-        return parsedChannels;
-      }
-    }
-  } catch (err) {
-    console.warn("Failed fetching live m3u database, loading defaults...", err);
+    console.warn("Failed loading working channels json, falling back to defaults...", err);
   }
 
   // Fallback
