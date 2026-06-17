@@ -168,16 +168,28 @@ function populateDashboardChannels(channels, category = "News") {
     item.className = 'dashboard-channel-item tv-focusable tv-transition flex items-center p-4 rounded-xl bg-surface-container-high w-full text-left';
     item.setAttribute('tabindex', '0');
     item.setAttribute('data-index', masterIdx);
+    item.setAttribute('data-url', ch.url);
     
     const logoHtml = ch.logo ? 
       `<img src="${ch.logo}" class="w-16 h-12 object-contain mr-4 rounded bg-white flex-shrink-0" onerror="this.style.display='none'">` :
       `<div class="w-16 h-12 bg-white rounded flex items-center justify-center mr-4 flex-shrink-0 text-black font-bold text-sm">${ch.name.substring(0,3).toUpperCase()}</div>`;
       
+    const statusBadge = (typeof window.brokenUrls !== 'undefined' && window.brokenUrls.has(ch.url)) ? 
+      `<span class="status-indicator font-label-sm text-label-sm ml-2 px-1 rounded text-[10px] bg-red-500/20 text-red-400 border border-red-500/30">OFFLINE</span>` : 
+      (typeof window.workingUrls !== 'undefined' && window.workingUrls.has(ch.url)) ? 
+      `<span class="status-indicator font-label-sm text-label-sm ml-2 px-1 rounded text-[10px] bg-green-500/20 text-green-400 border border-green-500/30">ONLINE</span>` : '';
+
+    const isBroken = typeof window.brokenUrls !== 'undefined' && window.brokenUrls.has(ch.url);
+    item.style.opacity = isBroken ? '0.5' : '1.0';
+
     item.innerHTML = `
       <span class="font-label-lg text-label-lg text-on-surface-variant w-12 flex-shrink-0">${idx + 1}</span>
       ${logoHtml}
       <div class="flex flex-col overflow-hidden">
-        <span class="font-label-lg text-label-lg text-on-surface font-semibold truncate">${ch.name}</span>
+        <div class="flex items-center">
+          <span class="font-label-lg text-label-lg text-on-surface font-semibold truncate">${ch.name}</span>
+          ${statusBadge}
+        </div>
         <div class="flex items-center space-x-2 mt-1">
           <span class="font-label-sm text-label-sm text-primary-container border border-primary-container px-1 rounded text-[10px] bg-primary-container/10">LIVE</span>
           <span class="font-label-sm text-label-sm text-on-surface-variant truncate">${ch.category}</span>
@@ -297,15 +309,28 @@ function triggerSearchQuery(query) {
     const item = document.createElement('button');
     item.className = 'search-result-item tv-focusable tv-transition flex items-center p-4 rounded-xl bg-surface-container-high w-full text-left';
     item.setAttribute('tabindex', '0');
+    item.setAttribute('data-index', idx); // or match index
+    item.setAttribute('data-url', ch.url);
     
     const logoHtml = ch.logo ? 
       `<img src="${ch.logo}" class="w-12 h-10 object-contain mr-4 rounded bg-white flex-shrink-0" onerror="this.style.display='none'">` :
       `<div class="w-12 h-10 bg-white rounded flex items-center justify-center mr-4 flex-shrink-0 text-black font-bold text-sm">${ch.name.substring(0,2).toUpperCase()}</div>`;
       
+    const statusBadge = (typeof window.brokenUrls !== 'undefined' && window.brokenUrls.has(ch.url)) ? 
+      `<span class="status-indicator font-label-sm text-label-sm ml-2 px-1 rounded text-[10px] bg-red-500/20 text-red-400 border border-red-500/30">OFFLINE</span>` : 
+      (typeof window.workingUrls !== 'undefined' && window.workingUrls.has(ch.url)) ? 
+      `<span class="status-indicator font-label-sm text-label-sm ml-2 px-1 rounded text-[10px] bg-green-500/20 text-green-400 border border-green-500/30">ONLINE</span>` : '';
+
+    const isBroken = typeof window.brokenUrls !== 'undefined' && window.brokenUrls.has(ch.url);
+    item.style.opacity = isBroken ? '0.5' : '1.0';
+
     item.innerHTML = `
       ${logoHtml}
       <div class="flex flex-col">
-        <span class="font-label-lg text-label-lg text-on-surface font-semibold">${ch.name}</span>
+        <div class="flex items-center">
+          <span class="font-label-lg text-label-lg text-on-surface font-semibold">${ch.name}</span>
+          ${statusBadge}
+        </div>
         <span class="text-xs text-on-surface-variant">${ch.category}</span>
       </div>
     `;

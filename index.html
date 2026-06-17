@@ -308,8 +308,16 @@
     <!-- Video Player Element -->
     <video id="hls-video-element" class="w-full h-full object-fill z-0"></video>
     
+    <!-- Loading/Error Status Overlay -->
+    <div id="player-status-overlay" class="absolute inset-0 flex flex-col items-center justify-center bg-black/60 z-10 pointer-events-none transition-opacity duration-300 hidden">
+      <div class="flex flex-col items-center space-y-4">
+        <span id="player-status-icon" class="material-symbols-outlined text-[64px] text-primary-container animate-spin">sync</span>
+        <span id="player-status-text" class="font-body-lg text-body-lg text-on-surface font-semibold bg-black/80 px-6 py-2 rounded-full border border-white/10">Loading Stream...</span>
+      </div>
+    </div>
+    
     <!-- Video Controls Overlay -->
-    <div id="player-controls-overlay" class="absolute inset-0 z-10 flex flex-col justify-between p-safe-margin-x pointer-events-none transition-opacity duration-300">
+    <div id="player-controls-overlay" class="absolute inset-0 z-20 flex flex-col justify-between p-safe-margin-x pointer-events-none transition-opacity duration-300">
       <!-- Header Bar overlay -->
       <div class="flex justify-between items-center pointer-events-auto">
         <button id="player-back-btn" class="w-12 h-12 rounded-full bg-surface-bright/20 flex items-center justify-center hover:bg-surface-bright/50 transition-colors text-on-surface tv-focusable">
