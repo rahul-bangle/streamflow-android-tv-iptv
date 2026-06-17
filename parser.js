@@ -80,12 +80,15 @@ async function loadChannels() {
   const statusEl = document.getElementById('splash-status');
   if (statusEl) statusEl.textContent = "Loading cached channels...";
 
-  // Check LocalStorage cache first
+  // Clear stale raw channels cache if it exists to force loading of verified database
   const cached = localStorage.getItem(IPTV_PLAYLIST_KEY);
   if (cached) {
     try {
       const parsed = JSON.parse(cached);
-      if (parsed && parsed.length > 0) {
+      // If the cache contains the unfiltered raw list (753 channels), clear it
+      if (parsed && parsed.length > 500) {
+        localStorage.removeItem(IPTV_PLAYLIST_KEY);
+      } else if (parsed && parsed.length > 0) {
         if (statusEl) statusEl.textContent = `Loaded ${parsed.length} channels!`;
         return parsed;
       }
